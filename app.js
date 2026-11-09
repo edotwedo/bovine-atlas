@@ -796,9 +796,9 @@ function resize() {
   camera.updateProjectionMatrix();
   // fit the whole animal (~2.5 m nose to tail) across the screen width
   const hfov = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * camera.aspect);
-  const dist = Math.max(3.2, 1.3 / Math.tan(hfov / 2));
+  const dist = Math.max(3.2, 1.45 / Math.tan(hfov / 2));
   const dir = V3(0.34, 0.16, 1).normalize();
-  HOME.target.set(0.08, w < h ? 0.5 : 0.72, 0);
+  HOME.target.set(0.2, w < h ? 0.5 : 0.72, 0);
   HOME.pos.copy(HOME.target).addScaledVector(dir, dist);
   if (!resize.done) { camera.position.copy(HOME.pos); controls.target.copy(HOME.target); resize.done = true; }
   controls.maxDistance = dist * 1.8;
