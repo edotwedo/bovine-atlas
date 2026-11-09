@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- horns -->
+    <path android:fillColor="#E8DCC0" android:pathData="M36,40 C30,38 26,33 27,27 C31,32 36,34 41,35 Z" />
+    <path android:fillColor="#E8DCC0" android:pathData="M72,40 C78,38 82,33 81,27 C77,32 72,34 67,35 Z" />
+    <!-- ears -->
+    <path android:fillColor="#B9573A" android:pathData="M38,42 C31,41 26,44 24,48 C30,50 36,49 41,46 Z" />
+    <path android:fillColor="#B9573A" android:pathData="M70,42 C77,41 82,44 84,48 C78,50 72,49 67,46 Z" />
+    <!-- face -->
+    <path android:fillColor="#C8643F" android:pathData="M54,33 C64,33 70,38 70,46 C70,56 66,64 64,70 L44,70 C42,64 38,56 38,46 C38,38 44,33 54,33 Z" />
+    <!-- blaze -->
+    <path android:fillColor="#F3EBDD" android:pathData="M54,36 C58,36 60,40 59,46 L57,62 L51,62 L49,46 C48,40 50,36 54,36 Z" />
+    <!-- muzzle -->
+    <path android:fillColor="#E9B9A4" android:pathData="M43,66 C43,62 47,60 54,60 C61,60 65,62 65,66 C65,72 61,76 54,76 C47,76 43,72 43,66 Z" />
+    <path android:fillColor="#5A2E22" android:pathData="M48,67 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0 Z M55.6,67 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0 Z" />
+    <!-- section line: schematic cut -->
+    <path android:strokeColor="#7FD3C4" android:strokeWidth="1.6" android:pathData="M34,52 L74,52" />
+</vector>
