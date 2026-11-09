@@ -4,16 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Bovine Atlas</title>
+<meta name="theme-color" content="#15171c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bovine Atlas">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
 <style>
 :root {
   --bg: #15171c; --panel: rgba(28, 31, 38, 0.94); --line: #2f343f; --ink: #eceff4; --mut: #9aa3b2; --acc: #7fd3c4;
   font-family: system-ui, -apple-system, "Roboto", sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; user-select: none; -webkit-user-select: none; }
+html, body { touch-action: manipulation; overscroll-behavior: none; margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; user-select: none; -webkit-user-select: none; }
 #gl { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-#top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px 0; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+#top { position: fixed; top: 0; left: 0; right: 0; padding: calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 0 calc(12px + env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 #top > * { pointer-events: auto; }
 .bar { display: flex; align-items: center; gap: 8px; }
 .brand { font-weight: 700; letter-spacing: .02em; font-size: 17px; flex: 1; }
@@ -29,7 +37,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .layer.off { opacity: .45; }
 .sw { width: 18px; height: 6px; border-radius: 3px; display: block; }
 .sw.skin { background: #8a4b2c; } .sw.fat { background: #f1e2b4; } .sw.muscle { background: #b8403a; } .sw.bone { background: #e6dcc3; }
-#sheet { position: fixed; left: 8px; right: 8px; bottom: 8px; max-height: 46%; overflow: auto; background: var(--panel); border: 1px solid var(--line);
+#sheet { position: fixed; left: calc(8px + env(safe-area-inset-left)); right: calc(8px + env(safe-area-inset-right)); bottom: calc(8px + env(safe-area-inset-bottom)); max-height: 46%; overflow: auto; background: var(--panel); border: 1px solid var(--line);
   border-radius: 18px; padding: 14px 14px 12px; transform: translateY(120%); transition: transform .22s ease; backdrop-filter: blur(8px); }
 #sheet.open { transform: none; }
 #sheet.compact { max-height: 30%; }
@@ -59,7 +67,7 @@ input[type=range] { width: 100%; accent-color: var(--acc); height: 28px; }
 .wrap { flex-wrap: wrap; }
 #panel { position: fixed; inset: 0; background: rgba(12, 13, 16, .97); transform: translateX(105%); transition: transform .22s ease; display: flex; flex-direction: column; }
 #panel.open { transform: none; }
-#panel .ph { display: flex; align-items: center; padding: 12px; gap: 8px; border-bottom: 1px solid var(--line); font-weight: 700; }
+#panel .ph { padding-top: calc(12px + env(safe-area-inset-top)) !important; display: flex; align-items: center; padding: 12px; gap: 8px; border-bottom: 1px solid var(--line); font-weight: 700; }
 #panel .ph span { flex: 1; }
 #panelBody { overflow: auto; padding: 4px 14px 30px; font-size: 14px; line-height: 1.45; }
 #q { width: 100%; margin-top: 10px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: #1d2027; color: var(--ink); font-size: 15px; user-select: text; }
@@ -70,6 +78,10 @@ input[type=range] { width: 100%; accent-color: var(--acc); height: 28px; }
 #labels { position: fixed; inset: 0; pointer-events: none; }
 .plabel { position: absolute; left: 0; top: 0; pointer-events: auto; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 8px; background: rgba(20, 22, 27, .82); border: 1px solid var(--c); color: var(--ink); white-space: nowrap; }
 .plabel.sel { background: var(--c); color: #111; }
+#install { position: fixed; left: 12px; right: 12px; top: 50%; transform: translateY(-50%); background: var(--panel); border: 1px solid var(--acc); border-radius: 16px; padding: 14px; font-size: 14px; line-height: 1.45; display: none; }
+#install.on { display: block; }
+#install b { color: var(--acc); }
+#install button { margin-top: 10px; width: 100%; padding: 10px; border-radius: 10px; background: #2b303b; font-weight: 600; }
 #toast { position: fixed; left: 50%; top: 45%; transform: translate(-50%, -50%) scale(.96); background: #000c; padding: 10px 14px; border-radius: 12px; font-size: 14px; opacity: 0; transition: .18s; pointer-events: none; }
 #toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 #err { position: fixed; top: 50%; left: 16px; right: 16px; color: #ff9b9b; text-align: center; }
@@ -98,9 +110,19 @@ body.ready #splash { opacity: 0; pointer-events: none; }
 <div id="sheet"><div id="sheetBody"></div></div>
 <div id="panel"><div class="ph"><span>Bovine Atlas</span><button class="ib" data-act="pclose">✕</button></div><div id="panelBody"></div></div>
 <div id="toast"></div>
+<div id="install"><b>Install on iPhone:</b> tap the Share button in Safari, then <b>Add to Home Screen</b>. It opens fullscreen and works offline after that.<button id="installOk">Got it</button></div>
 <div id="splash">Building the animal…</div>
 <div id="err"></div>
-<script>window.APP_VERSION = '0.1.0';</script>
+<script>window.APP_VERSION = '0.1.1';
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+window.addEventListener('load', () => {
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  let seen = false; try { seen = localStorage.getItem('installHintSeen') === '1'; } catch (e) {}
+  if (ios && !standalone && !seen) document.getElementById('install').classList.add('on');
+  document.getElementById('installOk').onclick = () => { document.getElementById('install').classList.remove('on'); try { localStorage.setItem('installHintSeen', '1'); } catch (e) {} };
+});
+</script>
 <script src="lib/three.min.js"></script>
 <script src="lib/OrbitControls.js"></script>
 <script src="data.js"></script>
