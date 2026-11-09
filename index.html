@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Bovine Atlas</title>
+<style>
+:root {
+  --bg: #15171c; --panel: rgba(28, 31, 38, 0.94); --line: #2f343f; --ink: #eceff4; --mut: #9aa3b2; --acc: #7fd3c4;
+  font-family: system-ui, -apple-system, "Roboto", sans-serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden; user-select: none; -webkit-user-select: none; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+#top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px 0; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+#top > * { pointer-events: auto; }
+.bar { display: flex; align-items: center; gap: 8px; }
+.brand { font-weight: 700; letter-spacing: .02em; font-size: 17px; flex: 1; }
+.brand small { display: block; font-weight: 500; color: var(--mut); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.ib { width: 40px; height: 40px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; }
+#modes { display: flex; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 3px; }
+#modes button { flex: 1; padding: 9px 0; border-radius: 11px; font-size: 14px; font-weight: 600; color: var(--mut); }
+#modes button.on { background: #2b303b; color: var(--ink); box-shadow: inset 0 0 0 1px #3b4250; }
+#layers { display: flex; gap: 6px; }
+.layer { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0 5px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); font-size: 12px; font-weight: 600; }
+.layer small { font-size: 10px; color: var(--mut); height: 12px; }
+.layer.ghost { border-style: dashed; }
+.layer.off { opacity: .45; }
+.sw { width: 18px; height: 6px; border-radius: 3px; display: block; }
+.sw.skin { background: #8a4b2c; } .sw.fat { background: #f1e2b4; } .sw.muscle { background: #b8403a; } .sw.bone { background: #e6dcc3; }
+#sheet { position: fixed; left: 8px; right: 8px; bottom: 8px; max-height: 46%; overflow: auto; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 18px; padding: 14px 14px 12px; transform: translateY(120%); transition: transform .22s ease; backdrop-filter: blur(8px); }
+#sheet.open { transform: none; }
+#sheet.compact { max-height: 30%; }
+.h { display: flex; align-items: flex-start; gap: 8px; }
+.h > div { flex: 1; }
+.ttl { font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.lat { color: var(--mut); font-style: italic; font-size: 13px; margin-top: 2px; }
+.x { width: 34px; height: 34px; border-radius: 10px; background: #2b303b; font-size: 14px; }
+.row { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--mut); width: 58px; }
+.meta { font-size: 12px; color: var(--mut); }
+.badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; color: var(--c); border: 1px solid var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); white-space: nowrap; }
+.chip { font-size: 13px; padding: 6px 10px; border-radius: 99px; background: #2b303b; border: 1px solid #3b4250; }
+.pchip { border-color: var(--c); box-shadow: inset 3px 0 0 var(--c); }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); display: inline-block; }
+.facts { margin: 10px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.45; }
+.facts li { margin-bottom: 4px; }
+sup.src { color: var(--acc); font-weight: 700; padding: 0 2px; cursor: pointer; }
+.fid { font-size: 12px; color: var(--mut); margin-top: 10px; line-height: 1.4; }
+.rule { font-size: 14px; line-height: 1.45; margin: 10px 0 0; }
+.acts { display: flex; gap: 8px; margin-top: 12px; }
+.acts button { flex: 1; padding: 11px 0; border-radius: 12px; background: #2b303b; border: 1px solid #3b4250; font-weight: 600; }
+.slider { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; font-size: 13px; color: var(--mut); }
+input[type=range] { width: 100%; accent-color: var(--acc); height: 28px; }
+.grp { margin-top: 12px; }
+.gh { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--mut); display: flex; align-items: center; gap: 8px; margin: 14px 0 6px; }
+.wrap { flex-wrap: wrap; }
+#panel { position: fixed; inset: 0; background: rgba(12, 13, 16, .97); transform: translateX(105%); transition: transform .22s ease; display: flex; flex-direction: column; }
+#panel.open { transform: none; }
+#panel .ph { display: flex; align-items: center; padding: 12px; gap: 8px; border-bottom: 1px solid var(--line); font-weight: 700; }
+#panel .ph span { flex: 1; }
+#panelBody { overflow: auto; padding: 4px 14px 30px; font-size: 14px; line-height: 1.45; }
+#q { width: 100%; margin-top: 10px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: #1d2027; color: var(--ink); font-size: 15px; user-select: text; }
+.list button { display: grid; grid-template-columns: 1fr auto; text-align: left; width: 100%; padding: 9px 4px; border-bottom: 1px solid #23272f; gap: 2px 8px; align-items: center; }
+.list button em { grid-column: 1; color: var(--mut); font-size: 12px; }
+.list button .badge { grid-column: 2; grid-row: 1 / span 2; }
+.refs { padding-left: 20px; } .refs li { margin-bottom: 6px; } .refs li.hl { color: var(--acc); }
+#labels { position: fixed; inset: 0; pointer-events: none; }
+.plabel { position: absolute; left: 0; top: 0; pointer-events: auto; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 8px; background: rgba(20, 22, 27, .82); border: 1px solid var(--c); color: var(--ink); white-space: nowrap; }
+.plabel.sel { background: var(--c); color: #111; }
+#toast { position: fixed; left: 50%; top: 45%; transform: translate(-50%, -50%) scale(.96); background: #000c; padding: 10px 14px; border-radius: 12px; font-size: 14px; opacity: 0; transition: .18s; pointer-events: none; }
+#toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+#err { position: fixed; top: 50%; left: 16px; right: 16px; color: #ff9b9b; text-align: center; }
+#splash { position: fixed; inset: 0; display: grid; place-items: center; color: var(--mut); background: var(--bg); transition: opacity .3s; }
+body.ready #splash { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="labels" style="display:none"></div>
+<div id="top">
+  <div class="bar">
+    <div class="brand">Bovine Atlas<small>Anatomy · butchery trainer</small></div>
+    <button class="ib" id="btnHome" aria-label="Reset view">⟲</button>
+    <button class="ib" id="btnIndex" aria-label="Structure index">☰</button>
+    <button class="ib" id="btnInfo" aria-label="Sources and fidelity">ⓘ</button>
+  </div>
+  <div id="modes">
+    <button data-mode="anatomy" class="on">Anatomy</button>
+    <button data-mode="primals">Primals</button>
+    <button data-mode="cuts">Cuts</button>
+    <button data-mode="dissect">Dissect</button>
+  </div>
+  <div id="layers"></div>
+</div>
+<div id="sheet"><div id="sheetBody"></div></div>
+<div id="panel"><div class="ph"><span>Bovine Atlas</span><button class="ib" data-act="pclose">✕</button></div><div id="panelBody"></div></div>
+<div id="toast"></div>
+<div id="splash">Building the animal…</div>
+<div id="err"></div>
+<script>window.APP_VERSION = '0.1.0';</script>
+<script src="lib/three.min.js"></script>
+<script src="lib/OrbitControls.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
